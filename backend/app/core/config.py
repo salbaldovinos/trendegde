@@ -41,6 +41,15 @@ class Settings(BaseSettings):
     TRADOVATE_API_KEY: str = ""
     TRADOVATE_API_SECRET: str = ""
 
+    # Broker credential encryption
+    BROKER_ENCRYPTION_MASTER_KEY: str = ""
+
+    # OAuth Providers (optional)
+    GOOGLE_OAUTH_CLIENT_ID: str = ""
+    GOOGLE_OAUTH_CLIENT_SECRET: str = ""
+    GITHUB_OAUTH_CLIENT_ID: str = ""
+    GITHUB_OAUTH_CLIENT_SECRET: str = ""
+
     # Monitoring (optional)
     SENTRY_DSN: str = ""
     AXIOM_API_TOKEN: str = ""

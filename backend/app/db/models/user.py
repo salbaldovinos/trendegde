@@ -36,6 +36,11 @@ class User(Base):
         server_default=text("gen_random_uuid()"),
     )
     email: Mapped[str] = mapped_column(Text, nullable=False)
+    display_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    timezone: Mapped[str] = mapped_column(
+        Text, nullable=False, server_default=text("'America/New_York'")
+    )
     role: Mapped[str] = mapped_column(
         Text, nullable=False, server_default=text("'user'")
     )

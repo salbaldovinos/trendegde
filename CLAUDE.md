@@ -139,17 +139,22 @@ When implementing a feature, always read the corresponding FSD first — it cont
 ## Implementation Progress
 
 > Source of truth: `progress.md` (detailed) — this table is the summary view. Agents must update both.
+> Frontend is built as **vertical slices** per phase (no separate frontend phase). Each phase includes its matching FSD-011x sub-spec.
 
-| Phase | PRDs | Domain | Status | Notes |
-|-------|------|--------|--------|-------|
+| Phase | PRDs/FSDs | Domain | Status | Notes |
+|-------|-----------|--------|--------|-------|
 | 1 | 001 | Platform Infrastructure | ~95% | CI/CD, tests, seed data done; Axiom/Uptime Robot external config remains |
-| 1 | 008 | Auth & User Management | ~40% | Basic auth done; OAuth, magic links, profiles, broker connections remain |
+| 1 | 008 | Auth & User Management | ~85% | Phase 1-2 done: full auth, profiles, broker connections, API keys, RBAC; Phase 3 remains (teams, onboarding, account deletion) |
+| 1 | FSD-011a | Frontend: App Shell & Navigation | ~15% | App Router, auth pages, BFF proxy done; layout, nav, theme remain |
 | 2 | 002 | Trendline Detection | not started | |
 | 2 | 003 | Trade Execution | not started | |
+| 2 | FSD-011b | Frontend: Dashboard & Trendline Views | not started | |
 | 3 | 004 | Trade Journaling | not started | |
 | 3 | 005 | Playbook System | not started | |
+| 3 | FSD-011c | Frontend: Execution & Journal Views | not started | |
 | 4 | 006 | Performance Analytics | not started | |
 | 4 | 007 | AI Features | not started | |
+| 4 | FSD-011d | Frontend: Analytics & Playbook Views | not started | |
 | 5 | 009 | Billing & Subscriptions | not started | |
 | 5 | 010 | Notifications & Integrations | not started | |
-| 6 | 011 | Frontend Dashboard | ~15% | App Router, auth pages, BFF proxy done; all feature pages remain |
+| 5 | FSD-011e | Frontend: Settings, Onboarding & AI Chat | not started | |

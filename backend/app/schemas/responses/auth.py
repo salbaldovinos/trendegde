@@ -36,3 +36,10 @@ class MessageResponse(BaseModel):
     """Simple message response."""
 
     message: str
+
+
+class OAuthUrlResponse(BaseModel):
+    """OAuth redirect URL response."""
+
+    url: str
+    provider: str

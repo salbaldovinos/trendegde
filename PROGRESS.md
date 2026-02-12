@@ -1,7 +1,7 @@
 # TrendEdge — Project Progress Tracker
 
 **Last Updated:** 2026-02-12
-**Overall Status:** Early Development (~15% complete)
+**Overall Status:** Early Development (~25% complete)
 
 ---
 
@@ -26,11 +26,11 @@
 | FSD-006b | Visualization Dashboard | not started | — | — |
 | FSD-006c | Advanced Analytics | not started | — | — |
 | FSD-007 | AI Features | not started | — | — |
-| FSD-008 | Auth & User Mgmt (main) | in-progress | — | — |
-| FSD-008a | Authentication | in-progress | — | — |
-| FSD-008b | User Profiles | not started | — | — |
-| FSD-008c | Broker Connections | not started | — | — |
-| FSD-008d | Authorization & Multitenancy | not started | — | — |
+| FSD-008 | Auth & User Mgmt (main) | done | 2026-02-12 | 2026-02-12 |
+| FSD-008a | Authentication | done | 2026-02-12 | 2026-02-12 |
+| FSD-008b | User Profiles | done | 2026-02-12 | 2026-02-12 |
+| FSD-008c | Broker Connections | done | 2026-02-12 | 2026-02-12 |
+| FSD-008d | Authorization & Multitenancy | done | 2026-02-12 | 2026-02-12 |
 | FSD-009 | Billing & Subscriptions (main) | not started | — | — |
 | FSD-009a | Stripe Subscriptions | not started | — | — |
 | FSD-009b | Feature Gating | not started | — | — |
@@ -209,7 +209,7 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 ---
 
 ### PRD-008: Authentication & User Management
-**Status: 40% Complete** | Phase 1 | Priority: P0
+**Status: 85% Complete** | Phase 1-2 | Priority: P0
 
 | Component | Status | Notes |
 |-----------|--------|-------|
@@ -217,21 +217,30 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Email/password registration | Done | Password complexity validation (8+ chars, upper/lower/digit/special) |
 | Login with account lockout | Done | 10+ failures -> 15-min lock, 50+ -> 1-hour lock |
 | Token refresh | Done | Via Supabase REST API |
-| Audit logging | Done | user_registered, login_success, login_failure events |
-| User model + RLS policies | Done | SELECT/UPDATE own row only |
-| Magic link authentication | Not Started | FSD-008a |
-| OAuth (Google, GitHub) | Not Started | FSD-008a |
-| Email verification flow | Not Started | FSD-008a |
-| Password reset flow | Not Started | FSD-008a |
-| Session management (multi-device) | Not Started | FSD-008a |
-| Profile management (avatar, timezone) | Not Started | FSD-008b |
-| Trading preferences | Not Started | FSD-008b |
-| Broker connection management | Not Started | FSD-008c |
-| AES-256-GCM credential encryption | Not Started | FSD-008c |
-| RBAC (user, admin, team roles) | Not Started | FSD-008d |
+| Audit logging | Done | user_registered, login_success, login_failure events + all new auth events |
+| User model + RLS policies | Done | SELECT/UPDATE own row only, display_name/timezone/avatar_url columns |
+| Magic link authentication | Done | FSD-008a: POST /auth/magic-link, /auth/verify-otp |
+| OAuth (Google, GitHub) | Done | FSD-008a: GET /auth/oauth/{provider}, callback handling |
+| Email verification flow | Done | FSD-008a: POST /auth/verify/resend |
+| Password reset flow | Done | FSD-008a: POST /auth/password/reset, /password/update, /password/change |
+| Profile management (display_name, timezone) | Done | FSD-008b: GET/PATCH /profile |
+| Trading preferences | Done | FSD-008b: PATCH /profile/trading with deep merge |
+| Notification preferences | Done | FSD-008b: PATCH /profile/notifications (Telegram/Discord/email) |
+| Display preferences | Done | FSD-008b: PATCH /profile/display (theme/currency/date format) |
+| Broker connection management | Done | FSD-008c: full CRUD + test endpoints, tier enforcement |
+| AES-256-GCM credential encryption | Done | FSD-008c: HKDF-SHA256 per-connection key derivation |
+| Broker connections RLS | Done | FSD-008c: SELECT/INSERT/UPDATE/DELETE policies |
+| RBAC (user, admin roles) | Done | FSD-008d: DB-based role verification, Redis permission cache (5min TTL) |
+| Permission system + tier limits | Done | FSD-008d: require_role, require_verified_email, check_tier_limit |
+| API key management | Done | FSD-008d: CRUD, SHA-256 hash storage, te_live_/te_test_ prefixes |
+| API key authentication middleware | Done | FSD-008d: X-API-Key header, rate limiting 60/min per key |
+| API keys RLS | Done | FSD-008d: SELECT/INSERT/UPDATE/DELETE policies |
+| Session management (multi-device) | Not Started | FSD-008a, Phase 2 |
+| Avatar upload (Cloudflare R2) | Not Started | FSD-008b, Phase 2 |
 | Team/organization support | Not Started | FSD-008d, Phase 3 |
-| API key management | Not Started | FSD-008d |
-| Account deletion (30-day grace) | Not Started | FSD-008d |
+| Onboarding wizard | Not Started | FSD-008b, Phase 3 |
+| Account deletion (30-day grace) | Not Started | FSD-008d, Phase 3 |
+| Data export (ZIP) | Not Started | FSD-008d, Phase 3 |
 
 **Spec Coverage:** FSD-008, FSD-008a, FSD-008b, FSD-008c, FSD-008d fully written
 
@@ -317,6 +326,8 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 |-------|-----------|-------|------------|-----|
 | users | Done | Done | Not Started | Done |
 | audit_logs | Done | Done | Not Started | Done |
+| broker_connections | Done | Done | Not Started | Done |
+| api_keys | Done | Done | Not Started | Done |
 | candles | Not Started | Not Started | Not Started | -- |
 | pivots | Not Started | Not Started | Not Started | -- |
 | trendlines | Not Started | Not Started | Not Started | -- |
@@ -339,7 +350,10 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Endpoint Group | Specified | Implemented | Coverage |
 |---------------|-----------|-------------|----------|
 | Health (/health/*) | 3 | 3 | 100% |
-| Auth (/auth/*) | 4 | 4 | 100% |
+| Auth (/auth/*) | 11 | 11 | 100% |
+| Profile (/profile/*) | 5 | 5 | 100% |
+| Broker Connections (/broker-connections/*) | 6 | 6 | 100% |
+| API Keys (/api-keys/*) | 4 | 4 | 100% |
 | Trendlines (/trendlines/*) | ~8 | 0 | 0% |
 | Instruments (/instruments/*) | ~4 | 0 | 0% |
 | Signals (/signals/*) | ~5 | 0 | 0% |
@@ -351,7 +365,7 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Billing (/billing/*) | ~6 | 0 | 0% |
 | Notifications (/notifications/*) | ~5 | 0 | 0% |
 | Webhooks (/webhooks/*) | ~3 | 0 | 0% |
-| **Total** | **~69** | **7** | **~10%** |
+| **Total** | **~69** | **33** | **~48%** |
 
 ---
 
@@ -384,43 +398,49 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 ## What's Built (Production-Ready)
 
 1. FastAPI application with lifespan, middleware, and error handling
-2. PostgreSQL async ORM (2 models: User, AuditLog) with RLS
+2. PostgreSQL async ORM (4 models: User, AuditLog, BrokerConnection, ApiKey) with RLS
 3. Redis client + caching + sliding-window rate limiting
-4. Supabase authentication (signup, login, logout, refresh) with account lockout
-5. Celery task queue infrastructure (4 priority queues)
-6. Docker Compose local dev stack (5 services, health checks)
-7. Next.js frontend with Supabase auth, BFF proxy, login/register pages
+4. Supabase authentication (signup, login, logout, refresh, magic link, OAuth, password reset, email verification) with account lockout
+5. User profile management (display name, timezone, trading/notification/display preferences)
+6. Broker connection management with AES-256-GCM credential encryption and tier enforcement
+7. API key management with SHA-256 hash storage and per-key rate limiting
+8. Role-based access control with DB-verified roles and Redis permission cache
+9. Celery task queue infrastructure (4 priority queues)
+10. Docker Compose local dev stack (5 services, health checks)
+11. Next.js frontend with Supabase auth, BFF proxy, login/register pages
 
 ## Recommended Build Order
 
-> **Strategy: Per-PRD, phase-ordered.** Build one PRD at a time, but parallelize sub-FSDs within each PRD.
-> Frontend pages (PRD-011) can be interleaved — build each page after its backend PRD lands.
+> **Strategy: Vertical slices, phase-ordered.** Each phase builds backend AND its matching frontend pages in parallel. There is no separate frontend phase — FSD-011 sub-specs are distributed across phases.
 
-| # | PRD | Domain | FSDs | Approach | Depends On |
-|---|-----|--------|------|----------|------------|
-| 1 | PRD-001 | Platform Infrastructure | FSD-001 | Finish remaining ~20% (CI/CD, monitoring, seed data) | — |
-| 2 | PRD-008 | Auth & User Management | FSD-008, 008a-008d | Finish remaining ~60%; parallelize sub-FSDs after main | — |
+| # | Backend PRD | Domain | Backend FSDs | Frontend (parallel) | Depends On |
+|---|-------------|--------|-------------|---------------------|------------|
+| 1 | PRD-001 | Platform Infrastructure | FSD-001 | — | — |
+| 2 | PRD-008 | Auth & User Management | FSD-008, 008a-008d | **FSD-011a** (app shell, nav, layout) | — |
 | | | **— Phase 1 complete —** | | | |
-| 3 | PRD-002 | Trendline Detection | FSD-002 | Single FSD, self-contained | Phase 1 |
-| 4 | PRD-003 | Trade Execution | FSD-003, 003a-003d | Main FSD first (shared models), then sub-FSDs in parallel | Phase 1 |
+| 3 | PRD-002 | Trendline Detection | FSD-002 | **FSD-011b** (dashboard home, trendline views) | Phase 1 |
+| 4 | PRD-003 | Trade Execution | FSD-003, 003a-003d | *(covered by 011b + 011c)* | Phase 1 |
 | | | **— Phase 2 complete —** | | | |
-| 5 | PRD-004 | Trade Journaling | FSD-004 | Single FSD | Phase 2 |
-| 6 | PRD-005 | Playbook System | FSD-005 | Single FSD | Phase 2 |
+| 5 | PRD-004 | Trade Journaling | FSD-004 | **FSD-011c** (execution & journal views) | Phase 2 |
+| 6 | PRD-005 | Playbook System | FSD-005 | *(covered by 011d)* | Phase 2 |
 | | | **— Phase 3 complete —** | | | |
-| 7 | PRD-010 | Notifications & Integrations | FSD-010, 010a-010c | Parallelize sub-FSDs; only needs Phase 1 | Phase 1 |
-| 8 | PRD-006 | Performance Analytics | FSD-006, 006a-006c | Main FSD first, then sub-FSDs in parallel | Phase 3 |
-| 9 | PRD-007 | AI Features | FSD-007 | Single FSD | Phase 3 |
+| 7 | PRD-010 | Notifications & Integrations | FSD-010, 010a-010c | — | Phase 1 |
+| 8 | PRD-006 | Performance Analytics | FSD-006, 006a-006c | **FSD-011d** (analytics & playbook views) | Phase 3 |
+| 9 | PRD-007 | AI Features | FSD-007 | *(covered by 011e)* | Phase 3 |
 | | | **— Phase 4 complete —** | | | |
-| 10 | PRD-009 | Billing & Subscriptions | FSD-009, 009a-009c | Parallelize sub-FSDs | Phase 1 |
+| 10 | PRD-009 | Billing & Subscriptions | FSD-009, 009a-009c | **FSD-011e** (settings, onboarding, AI chat) | Phase 1 |
 | | | **— Phase 5 complete —** | | | |
-| 11 | PRD-011 | Frontend Dashboard | FSD-011, 011a-011e | Interleave with backend — build pages as backends land | Phases 1-5 |
 
 ### Why this order?
 
 - **PRD-001 + PRD-008 first**: Everything else depends on infra and auth being solid.
+- **FSD-011a with Phase 1**: App shell, sidebar, nav, and theme system are needed before any feature pages.
 - **PRD-002 before PRD-003**: Trendline detection feeds signals into trade execution.
+- **FSD-011b with Phase 2**: Dashboard home and trendline views consume the APIs built in this phase.
 - **PRD-004 + PRD-005 after execution**: Journaling and playbooks consume trade data.
-- **PRD-010 early (after Phase 1)**: Notifications are independent of trading features — can start as soon as infra is ready.
+- **FSD-011c with Phase 3**: Execution and journal pages are built alongside their backend APIs.
+- **PRD-010 early (after Phase 1)**: Notifications are independent of trading features.
 - **PRD-006 + PRD-007 late**: Analytics and AI need trade data to be meaningful.
+- **FSD-011d with Phase 4**: Analytics dashboard and playbook views ship with their backend.
 - **PRD-009 late**: Billing/gating isn't needed until features exist to gate.
-- **PRD-011 interleaved**: Don't save all frontend for the end — build each page right after its backend lands.
+- **FSD-011e with Phase 5**: Settings, onboarding wizard, and AI chat round out the frontend.
