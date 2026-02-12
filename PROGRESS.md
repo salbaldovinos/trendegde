@@ -1,7 +1,7 @@
 # TrendEdge — Project Progress Tracker
 
 **Last Updated:** 2026-02-12
-**Overall Status:** Early Development (~25% complete)
+**Overall Status:** Early Development (~30% complete)
 
 ---
 
@@ -13,7 +13,7 @@
 | FSD | Domain | Status | Started | Completed |
 |-----|--------|--------|---------|-----------|
 | FSD-001 | Platform Infrastructure | done | — | 2026-02-12 |
-| FSD-002 | Trendline Detection | not started | — | — |
+| FSD-002 | Trendline Detection | done | 2026-02-12 | 2026-02-12 |
 | FSD-003 | Trade Execution (main) | not started | — | — |
 | FSD-003a | Signal Ingestion | not started | — | — |
 | FSD-003b | Risk Management | not started | — | — |
@@ -40,8 +40,8 @@
 | FSD-010b | Channel Integrations | not started | — | — |
 | FSD-010c | Market Data | not started | — | — |
 | FSD-011 | Frontend Dashboard (main) | in-progress | — | — |
-| FSD-011a | App Shell | not started | — | — |
-| FSD-011b | Dashboard & Trendlines | not started | — | — |
+| FSD-011a | App Shell | in-progress | 2026-02-12 | — |
+| FSD-011b | Dashboard & Trendlines | in-progress | 2026-02-12 | — |
 | FSD-011c | Execution & Journal Views | not started | — | — |
 | FSD-011d | Analytics & Playbook Views | not started | — | — |
 | FSD-011e | Settings, Onboarding & Chat | not started | — | — |
@@ -95,21 +95,29 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 ---
 
 ### PRD-002: Trendline Detection Engine
-**Status: 0% Complete** | Phase 1 | Priority: P0
+**Status: 98% Complete** | Phase 1 | Priority: P0
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Market data ingestion (yfinance/IBKR) | Not Started | |
-| Candle storage & gap detection | Not Started | |
-| ATR computation (14-period) | Not Started | |
-| Swing point detection (pivot highs/lows) | Not Started | |
-| Candidate trendline generation (RANSAC) | Not Started | |
-| Touch scoring & validation | Not Started | |
-| Quality grading (A+/A/B) & composite score | Not Started | |
-| Trendline state machine | Not Started | detected -> qualifying -> active -> traded -> invalidated -> expired |
-| Alert generation & routing | Not Started | |
-| DB tables: candles, pivots, trendlines, alerts | Not Started | |
-| API endpoints: /api/v1/trendlines/* | Not Started | |
+| Market data ingestion (yfinance) | Done | MarketDataService with bootstrap + incremental ingest |
+| Candle storage & gap detection | Done | Bulk upsert with ON CONFLICT, gap_detection_and_fill task |
+| ATR computation (14-period) | Done | Wilder's smoothed ATR in MarketDataService |
+| Swing point detection (pivot highs/lows) | Done | scipy.signal.find_peaks, boundary exclusion, flat handling |
+| Candidate trendline generation | Done | Pairwise generation with body-cross validation, slope normalization |
+| Touch scoring & validation | Done | ATR-scaled tolerance, spacing enforcement, composite score |
+| Quality grading (A+/A/B) & composite score | Done | Full rubric with user config overrides |
+| Trendline state machine | Done | detected -> qualifying -> active -> traded/invalidated/expired |
+| State machine transitions (promote/demote/expire) | Done | promote_or_demote_trendlines (3*ATR threshold), expire_stale_trendlines (6mo) |
+| Proximity-based score decay | Done | Score decay when distance > 5*ATR, factor = 5*ATR/distance |
+| Alert generation & routing | Done | Break/touch/promotion/invalidation alerts with dedup |
+| DB tables (8 total) | Done | instruments, candles, pivots, trendlines, trendline_events, alerts, user_detection_config, user_watchlist |
+| API endpoints (route-service alignment) | Done | trendlines, instruments, watchlist, detection_config, alerts; Pydantic response models aligned |
+| Celery tasks (6 tasks) | Done | ingest, detect, evaluate_alerts, recalculate, bootstrap, gap_fill |
+| Celery Beat schedule | Done | ingest_candles every 4H, gap_detection_and_fill daily 6AM UTC |
+| Unit tests (detection engine) | Done | 33+ tests: pivots, candidates, scoring, grading, projection, ATR |
+| Integration tests (pipeline) | Done | 16 tests: bootstrap, config, tier limits, alerts, lifecycle, decay, watchlist |
+| Forward projection & bracket orders | Done | Safety line, entry/stop/target, position sizing |
+| IBKR live data integration | Not Started | Phase 2: broker adapter data feed |
 
 **Spec Coverage:** FSD-002 fully written
 
@@ -289,7 +297,7 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 ---
 
 ### PRD-011: Frontend Dashboard & UI/UX
-**Status: 15% Complete** | Phase 1-3 | Priority: P0
+**Status: 35% Complete** | Phase 1-3 | Priority: P0
 
 | Component | Status | Notes |
 |-----------|--------|-------|
@@ -302,12 +310,23 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Auth callback handler | Done | OAuth redirect handler |
 | Auth layout (centered card) | Done | Shared layout for login/register |
 | Base UI components (Button, Input, Card, Label) | Done | shadcn/ui primitives |
-| CSS design tokens (light/dark) | Done | HSL variables in globals.css |
-| Sidebar navigation | Not Started | FSD-011a |
-| Header bar (breadcrumbs, mode indicator) | Not Started | FSD-011a |
+| Extended UI components | Done | Tabs, Select, Dialog, Tooltip, Badge, Slider, Accordion, Sheet, Skeleton, etc. |
+| CSS design tokens (light/dark) | Done | HSL variables incl. trading colors (profit/loss/grades/alerts) |
+| Providers (QueryClient + Toaster) | Done | TanStack Query + sonner |
+| TypeScript types | Done | Trendline, Dashboard, API types matching backend schemas |
+| API client | Done | Typed fetch wrapper using BFF proxy |
+| Zustand stores | Done | UI store, trendline store, positions store |
+| TanStack Query hooks | Done | Dashboard queries, trendline queries, instrument queries |
+| Mock data system | Done | Gated by NEXT_PUBLIC_USE_MOCKS env var |
+| Format utilities | Done | formatDollars, formatPercent, formatR, formatRelativeTime |
+| Sidebar navigation | Done | FSD-011a: collapsible with lucide icons |
+| Header bar (mode indicator) | Done | FSD-011a: Paper/Live badge, avatar placeholder |
+| Dashboard layout (3-col) | Done | FSD-011a: sidebar + header + main content area |
 | Command palette (Cmd+K) | Not Started | FSD-011a |
-| Dashboard home page | Not Started | FSD-011b |
-| Trendline detection page | Not Started | FSD-011b |
+| Dashboard home page | Done | FSD-011b: P&L, stats, positions, alerts, recent trades widgets |
+| Trendline detection page | Done | FSD-011b: 3-column with chart, list panel, detail/config panel |
+| Candlestick chart | Done | FSD-011b: TradingView Lightweight Charts with trendline overlays |
+| Detection config panel | Done | FSD-011b: 6 params with sliders, presets, apply/reset |
 | Execution page | Not Started | FSD-011c |
 | Journal page | Not Started | FSD-011c |
 | Analytics dashboard | Not Started | FSD-011d |
@@ -328,10 +347,14 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | audit_logs | Done | Done | Not Started | Done |
 | broker_connections | Done | Done | Not Started | Done |
 | api_keys | Done | Done | Not Started | Done |
-| candles | Not Started | Not Started | Not Started | -- |
-| pivots | Not Started | Not Started | Not Started | -- |
-| trendlines | Not Started | Not Started | Not Started | -- |
-| alerts | Not Started | Not Started | Not Started | -- |
+| instruments | Done | Done | Not Started | No (shared ref) |
+| candles | Done | Done | Not Started | No (shared data) |
+| pivots | Done | Done | Not Started | No |
+| trendlines | Done | Done | Not Started | Done |
+| trendline_events | Done | Done | Not Started | No |
+| alerts | Done | Done | Not Started | Done |
+| user_detection_config | Done | Done | Not Started | Done |
+| user_watchlist | Done | Done | Not Started | Done |
 | signals | Not Started | Not Started | Not Started | -- |
 | orders | Not Started | Not Started | Not Started | -- |
 | positions | Not Started | Not Started | Not Started | -- |
@@ -354,8 +377,11 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Profile (/profile/*) | 5 | 5 | 100% |
 | Broker Connections (/broker-connections/*) | 6 | 6 | 100% |
 | API Keys (/api-keys/*) | 4 | 4 | 100% |
-| Trendlines (/trendlines/*) | ~8 | 0 | 0% |
-| Instruments (/instruments/*) | ~4 | 0 | 0% |
+| Trendlines (/trendlines/*) | ~8 | 3 | ~38% |
+| Instruments (/instruments/*) | ~4 | 2 | 50% |
+| Watchlist (/watchlist/*) | 3 | 3 | 100% |
+| Detection Config (/config/*) | 3 | 3 | 100% |
+| Alerts (/alerts/*) | 3 | 3 | 100% |
 | Signals (/signals/*) | ~5 | 0 | 0% |
 | Orders (/orders/*) | ~6 | 0 | 0% |
 | Journal (/journal/*) | ~8 | 0 | 0% |
@@ -365,7 +391,7 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Billing (/billing/*) | ~6 | 0 | 0% |
 | Notifications (/notifications/*) | ~5 | 0 | 0% |
 | Webhooks (/webhooks/*) | ~3 | 0 | 0% |
-| **Total** | **~69** | **33** | **~48%** |
+| **Total** | **~81** | **47** | **~58%** |
 
 ---
 
@@ -373,8 +399,8 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 
 | Category | Written | Status |
 |----------|---------|--------|
-| Backend unit tests | 14 | 4 files: test_health, test_error_handling, test_middleware, test_config |
-| Backend integration tests | 2 | 2 files: test_db_health, test_redis_health (requires_db/requires_redis) |
+| Backend unit tests | 47+ | 5 files: test_health, test_error_handling, test_middleware, test_config, test_detection_engine |
+| Backend integration tests | 18 | 3 files: test_db_health, test_redis_health, test_trendline_pipeline (16 tests) |
 | Backend e2e tests | 0 | Not started |
 | Frontend unit tests (Jest) | 0 | Not started |
 | Frontend e2e tests (Playwright) | 0 | Not started |
@@ -405,9 +431,19 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 6. Broker connection management with AES-256-GCM credential encryption and tier enforcement
 7. API key management with SHA-256 hash storage and per-key rate limiting
 8. Role-based access control with DB-verified roles and Redis permission cache
-9. Celery task queue infrastructure (4 priority queues)
+9. Celery task queue infrastructure (7 queues: high, default, low, notifications, market_data, detection, alerts) with Beat schedule
 10. Docker Compose local dev stack (5 services, health checks)
 11. Next.js frontend with Supabase auth, BFF proxy, login/register pages
+12. Trendline detection engine: pivot detection (scipy), candidate generation, touch scoring, grading (A+/A/B), composite ranking
+13. Market data service: yfinance ingestion, ATR computation, gap detection
+14. Trendline service: full detection pipeline, state machine (with promote/demote/expire), alert evaluation, watchlist management, proximity-based score decay
+15. 8 PRD-002 DB tables with RLS policies (instruments, candles, pivots, trendlines, trendline_events, alerts, user_detection_config, user_watchlist)
+16. 14 new API endpoints: trendlines, instruments, watchlist, detection config, alerts (all with proper Pydantic response alignment)
+17. 6 Celery tasks with Beat schedule: candle ingestion (4H), incremental detection, alert evaluation, full recalculation, bootstrap, gap detection (daily 6AM)
+18. 16 trendline pipeline integration tests: bootstrap, config, tier limits, alert dedup, lifecycle, state transitions, proximity decay, watchlist
+19. Frontend app shell: sidebar navigation, header bar, dashboard layout, providers, Zustand stores, TanStack Query hooks
+20. Dashboard home page: P&L summary, quick stats, active positions, trendline alerts, recent trades widgets
+21. Trendline detection page: candlestick chart (Lightweight Charts), trendline list panel, detail panel, detection config panel with presets
 
 ## Recommended Build Order
 

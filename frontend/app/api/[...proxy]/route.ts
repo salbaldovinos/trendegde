@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 async function proxyRequest(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   // Build the target URL by stripping the /api prefix

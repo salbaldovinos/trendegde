@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 from kombu import Queue
 
 # Handle import for when Celery runs standalone (outside FastAPI)
@@ -45,6 +46,9 @@ celery_app.conf.update(
         Queue("default", routing_key="default"),
         Queue("low", routing_key="low"),
         Queue("notifications", routing_key="notifications"),
+        Queue("market_data", routing_key="market_data"),
+        Queue("detection", routing_key="detection"),
+        Queue("alerts", routing_key="alerts"),
     ],
     task_default_queue="default",
     task_default_routing_key="default",
@@ -52,5 +56,24 @@ celery_app.conf.update(
     task_routes={
         "app.tasks.*.process_webhook": {"queue": "high"},
         "app.tasks.*.send_*": {"queue": "notifications"},
+        "app.tasks.trendline_tasks.ingest_*": {"queue": "market_data"},
+        "app.tasks.trendline_tasks.bootstrap_*": {"queue": "market_data"},
+        "app.tasks.trendline_tasks.detect_*": {"queue": "detection"},
+        "app.tasks.trendline_tasks.recalculate_*": {"queue": "detection"},
+        "app.tasks.trendline_tasks.evaluate_*": {"queue": "alerts"},
+        "app.tasks.trendline_tasks.gap_*": {"queue": "low"},
+    },
+    # Task autodiscovery
+    include=["app.tasks.trendline_tasks"],
+    # Beat schedule for periodic tasks
+    beat_schedule={
+        "ingest_candles": {
+            "task": "app.tasks.trendline_tasks.ingest_candles",
+            "schedule": crontab(minute=0, hour="1,5,9,13,17,21"),
+        },
+        "gap_detection_and_fill": {
+            "task": "app.tasks.trendline_tasks.gap_detection_and_fill",
+            "schedule": crontab(minute=0, hour=6),
+        },
     },
 )
