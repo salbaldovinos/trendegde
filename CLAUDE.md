@@ -135,3 +135,21 @@ All detailed specifications live in `_docs/`:
 - **00-Technical_Spec_Writing_Guide_v2.md**: Documentation standards
 
 When implementing a feature, always read the corresponding FSD first — it contains exact field names, validation rules, error messages, state transitions, and edge cases.
+
+## Implementation Progress
+
+> Source of truth: `progress.md` (detailed) — this table is the summary view. Agents must update both.
+
+| Phase | PRDs | Domain | Status | Notes |
+|-------|------|--------|--------|-------|
+| 1 | 001 | Platform Infrastructure | ~95% | CI/CD, tests, seed data done; Axiom/Uptime Robot external config remains |
+| 1 | 008 | Auth & User Management | ~40% | Basic auth done; OAuth, magic links, profiles, broker connections remain |
+| 2 | 002 | Trendline Detection | not started | |
+| 2 | 003 | Trade Execution | not started | |
+| 3 | 004 | Trade Journaling | not started | |
+| 3 | 005 | Playbook System | not started | |
+| 4 | 006 | Performance Analytics | not started | |
+| 4 | 007 | AI Features | not started | |
+| 5 | 009 | Billing & Subscriptions | not started | |
+| 5 | 010 | Notifications & Integrations | not started | |
+| 6 | 011 | Frontend Dashboard | ~15% | App Router, auth pages, BFF proxy done; all feature pages remain |

@@ -1,0 +1,70 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: cd-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Only deploy after CI passes on main
+    needs: []
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # Railway deployment
+      #
+      # Railway auto-deploys from the main branch when connected via
+      # their GitHub integration. If manual deployment is preferred,
+      # install the Railway CLI and use the steps below.
+      #
+      # Prerequisites:
+      #   1. Add RAILWAY_TOKEN to GitHub repository secrets
+      #   2. Set RAILWAY_PROJECT_ID and RAILWAY_SERVICE_ID below
+      #   3. Uncomment the deployment steps
+      # ---------------------------------------------------------------
+
+      # - name: Install Railway CLI
+      #   run: npm install -g @railway/cli
+
+      # - name: Deploy to Railway
+      #   env:
+      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      #   run: railway up --service backend --detach
+      #   working-directory: backend
+
+      # - name: Run database migrations
+      #   env:
+      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      #   run: railway run alembic upgrade head
+      #   working-directory: backend
+
+      - name: Deployment placeholder
+        run: |
+          echo "Railway auto-deploys from main branch."
+          echo "See comments in this workflow for manual deployment setup."
+
+      # ---------------------------------------------------------------
+      # Health check — uncomment once staging URL is available
+      # ---------------------------------------------------------------
+
+      # - name: Health check
+      #   run: |
+      #     for i in 1 2 3 4 5; do
+      #       STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ vars.STAGING_URL }}/health" || true)
+      #       if [ "$STATUS" = "200" ]; then
+      #         echo "Health check passed"
+      #         exit 0
+      #       fi
+      #       echo "Attempt $i: got status $STATUS, retrying in 10s..."
+      #       sleep 10
+      #     done
+      #     echo "Health check failed after 5 attempts"
+      #     exit 1
