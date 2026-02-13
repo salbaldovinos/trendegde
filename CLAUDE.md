@@ -147,11 +147,11 @@ When implementing a feature, always read the corresponding FSD first — it cont
 | 1 | 008 | Auth & User Management | ~85% | Phase 1-2 done: full auth, profiles, broker connections, API keys, RBAC; Phase 3 remains (teams, onboarding, account deletion) |
 | 1 | FSD-011a | Frontend: App Shell & Navigation | ~50% | App shell, sidebar, header, providers, design tokens done; cmd palette remains |
 | 2 | 002 | Trendline Detection | ~98% | Beat schedule, state transitions, proximity decay, route alignment, 16 integration tests done; IBKR live feed P2 |
-| 2 | 003 | Trade Execution | not started | |
-| 2 | FSD-011b | Frontend: Dashboard & Trendline Views | ~70% | Dashboard home + trendline page done (mock data); live API integration remains |
+| 2 | 003 | Trade Execution | ~98% | All backend complete: 11 tables, 3 services (46 methods), 16+ endpoints, 3 Celery tasks, PaperBrokerAdapter, 91 tests; frontend wired to live API; IBKR/Tradovate live adapters Phase 2 |
+| 2 | FSD-011b | Frontend: Dashboard & Trendline Views | ~85% | Dashboard home + trendline page done (mock data); sidebar updated; live API integration remains |
 | 3 | 004 | Trade Journaling | not started | |
 | 3 | 005 | Playbook System | not started | |
-| 3 | FSD-011c | Frontend: Execution & Journal Views | not started | |
+| 3 | FSD-011c | Frontend: Execution & Journal Views | ~90% | Execution page done (7 components wired to live API, SL/TP modify, risk dots); Journal page components done but API integration blocked on FSD-004 |
 | 4 | 006 | Performance Analytics | not started | |
 | 4 | 007 | AI Features | not started | |
 | 4 | FSD-011d | Frontend: Analytics & Playbook Views | not started | |

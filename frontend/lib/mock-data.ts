@@ -1,5 +1,7 @@
 import type { Instrument, Trendline, CandleData, DetectionParams, TrendlineAlert } from "@/types/trendline";
 import type { PnlSummary, Position, TradeSummary, DashboardStats } from "@/types/dashboard";
+import type { Signal, Order, ExecutionPosition, RiskSettings, CircuitBreakerStatus, BrokerStatus } from "@/types/execution";
+import type { Trade, TradeStats } from "@/types/journal";
 
 // --- Instruments ---
 export const mockInstruments: Instrument[] = [
@@ -263,4 +265,121 @@ export const mockDetectionParams: DetectionParams = {
   pivotNBarLookback: 5,
   maxLinesPerInstrument: 10,
   presetName: "default",
+};
+
+// --- Execution Mock Data ---
+export const mockExecutionPositions: ExecutionPosition[] = [
+  { id: "pos-1", signalId: "sig-1", instrumentSymbol: "MNQ", direction: "LONG", entryPrice: 21450.25, currentPrice: 21520.50, stopLossPrice: 21380.00, takeProfitPrice: 21590.00, quantity: 2, unrealizedPnl: 70.25, realizedPnl: null, netPnl: null, rMultiple: 1.0, mae: -35.50, mfe: 82.75, status: "OPEN", exitReason: null, enteredAt: "2026-02-12T09:35:00Z", closedAt: null, createdAt: "2026-02-12T09:35:00Z" },
+  { id: "pos-2", signalId: "sig-3", instrumentSymbol: "MES", direction: "SHORT", entryPrice: 6050.75, currentPrice: 6035.25, stopLossPrice: 6075.00, takeProfitPrice: 6000.00, quantity: 1, unrealizedPnl: 77.50, realizedPnl: null, netPnl: null, rMultiple: 0.64, mae: -12.25, mfe: 95.50, status: "OPEN", exitReason: null, enteredAt: "2026-02-11T14:20:00Z", closedAt: null, createdAt: "2026-02-11T14:20:00Z" },
+  { id: "pos-3", signalId: "sig-5", instrumentSymbol: "MCL", direction: "LONG", entryPrice: 72.45, currentPrice: 73.10, stopLossPrice: 71.80, takeProfitPrice: 74.00, quantity: 1, unrealizedPnl: 65.00, realizedPnl: null, netPnl: null, rMultiple: 1.0, mae: -15.00, mfe: 78.00, status: "OPEN", exitReason: null, enteredAt: "2026-02-10T10:00:00Z", closedAt: null, createdAt: "2026-02-10T10:00:00Z" },
+  { id: "pos-4", signalId: null, instrumentSymbol: "MGC", direction: "SHORT", entryPrice: 2920.00, currentPrice: 2905.50, stopLossPrice: 2945.00, takeProfitPrice: 2870.00, quantity: 2, unrealizedPnl: 29.00, realizedPnl: null, netPnl: null, rMultiple: 0.58, mae: -8.00, mfe: 35.00, status: "OPEN", exitReason: null, enteredAt: "2026-02-12T08:15:00Z", closedAt: null, createdAt: "2026-02-12T08:15:00Z" },
+  { id: "pos-5", signalId: "sig-7", instrumentSymbol: "MYM", direction: "LONG", entryPrice: 44150.00, currentPrice: 44280.00, stopLossPrice: 44050.00, takeProfitPrice: 44400.00, quantity: 1, unrealizedPnl: 65.00, realizedPnl: null, netPnl: null, rMultiple: 1.3, mae: -22.00, mfe: 72.00, status: "OPEN", exitReason: null, enteredAt: "2026-02-11T09:45:00Z", closedAt: null, createdAt: "2026-02-11T09:45:00Z" },
+];
+
+export const mockSignals: Signal[] = [
+  { id: "sig-pending-1", source: "INTERNAL", status: "RISK_PASSED", instrumentSymbol: "MNQ", direction: "LONG", entryType: "MARKET", entryPrice: 21550.00, stopLossPrice: 21480.00, takeProfitPrice: 21690.00, quantity: 2, trendlineId: "tl-1", trendlineGrade: "A+", enrichmentData: { riskRewardRatio: 2.0, riskPerContract: 35.00 }, rejectionReason: null, riskChecks: [{ checkName: "MAX_POSITION_SIZE", result: "PASS", actualValue: 2, thresholdValue: 5, details: null }], createdAt: "2026-02-12T10:15:00Z", updatedAt: "2026-02-12T10:15:00Z" },
+  { id: "sig-pending-2", source: "WEBHOOK", status: "VALIDATED", instrumentSymbol: "MES", direction: "SHORT", entryType: "LIMIT", entryPrice: 6080.00, stopLossPrice: 6105.00, takeProfitPrice: 6030.00, quantity: null, trendlineId: null, trendlineGrade: null, enrichmentData: null, rejectionReason: null, riskChecks: null, createdAt: "2026-02-12T10:20:00Z", updatedAt: "2026-02-12T10:20:00Z" },
+  { id: "sig-pending-3", source: "MANUAL", status: "RECEIVED", instrumentSymbol: "MCL", direction: "LONG", entryType: "MARKET", entryPrice: 73.50, stopLossPrice: 72.80, takeProfitPrice: 75.00, quantity: 1, trendlineId: null, trendlineGrade: null, enrichmentData: null, rejectionReason: null, riskChecks: null, createdAt: "2026-02-12T10:25:00Z", updatedAt: "2026-02-12T10:25:00Z" },
+];
+
+export const mockOrders: Order[] = [
+  { id: "ord-1", signalId: "sig-1", bracketGroupId: "bg-1", instrumentSymbol: "MNQ", side: "BUY", orderType: "MARKET", bracketRole: "ENTRY", price: null, quantity: 2, timeInForce: "GTC", status: "FILLED", brokerOrderId: "PAPER-ABC123", fillPrice: 21450.25, filledQuantity: 2, commission: 1.24, slippageTicks: 1, submittedAt: "2026-02-12T09:35:00Z", filledAt: "2026-02-12T09:35:00Z", createdAt: "2026-02-12T09:35:00Z" },
+  { id: "ord-2", signalId: "sig-1", bracketGroupId: "bg-1", instrumentSymbol: "MNQ", side: "SELL", orderType: "STOP", bracketRole: "STOP_LOSS", price: 21380.00, quantity: 2, timeInForce: "GTC", status: "SUBMITTED", brokerOrderId: "PAPER-ABC124", fillPrice: null, filledQuantity: null, commission: null, slippageTicks: null, submittedAt: "2026-02-12T09:35:00Z", filledAt: null, createdAt: "2026-02-12T09:35:00Z" },
+  { id: "ord-3", signalId: "sig-1", bracketGroupId: "bg-1", instrumentSymbol: "MNQ", side: "SELL", orderType: "LIMIT", bracketRole: "TAKE_PROFIT", price: 21590.00, quantity: 2, timeInForce: "GTC", status: "SUBMITTED", brokerOrderId: "PAPER-ABC125", fillPrice: null, filledQuantity: null, commission: null, slippageTicks: null, submittedAt: "2026-02-12T09:35:00Z", filledAt: null, createdAt: "2026-02-12T09:35:00Z" },
+  { id: "ord-4", signalId: "sig-3", bracketGroupId: "bg-2", instrumentSymbol: "MES", side: "SELL", orderType: "MARKET", bracketRole: "ENTRY", price: null, quantity: 1, timeInForce: "GTC", status: "FILLED", brokerOrderId: "PAPER-DEF123", fillPrice: 6050.75, filledQuantity: 1, commission: 0.62, slippageTicks: 1, submittedAt: "2026-02-11T14:20:00Z", filledAt: "2026-02-11T14:20:00Z", createdAt: "2026-02-11T14:20:00Z" },
+  { id: "ord-5", signalId: "sig-3", bracketGroupId: "bg-2", instrumentSymbol: "MES", side: "BUY", orderType: "STOP", bracketRole: "STOP_LOSS", price: 6075.00, quantity: 1, timeInForce: "GTC", status: "SUBMITTED", brokerOrderId: "PAPER-DEF124", fillPrice: null, filledQuantity: null, commission: null, slippageTicks: null, submittedAt: "2026-02-11T14:20:00Z", filledAt: null, createdAt: "2026-02-11T14:20:00Z" },
+  { id: "ord-6", signalId: "sig-3", bracketGroupId: "bg-2", instrumentSymbol: "MES", side: "BUY", orderType: "LIMIT", bracketRole: "TAKE_PROFIT", price: 6000.00, quantity: 1, timeInForce: "GTC", status: "SUBMITTED", brokerOrderId: "PAPER-DEF125", fillPrice: null, filledQuantity: null, commission: null, slippageTicks: null, submittedAt: "2026-02-11T14:20:00Z", filledAt: null, createdAt: "2026-02-11T14:20:00Z" },
+];
+
+export const mockRiskSettings: RiskSettings = {
+  maxPositionSizeMicro: 2,
+  maxPositionSizeFull: 1,
+  dailyLossLimit: 500,
+  maxConcurrentPositions: 3,
+  minRiskReward: 2.0,
+  correlationLimit: 0.70,
+  maxSingleTradeRisk: 200,
+  tradingHoursMode: "RTH",
+  stalenessMinutes: 5,
+  paperSlippageTicks: 1,
+  circuitBreakerThreshold: 3,
+  autoFlattenLossLimit: null,
+  isPaperMode: true,
+  updatedAt: "2026-02-10T00:00:00Z",
+};
+
+export const mockCircuitBreaker: CircuitBreakerStatus = {
+  state: "CLOSED",
+  consecutiveLosses: 1,
+  threshold: 3,
+  lastTrippedAt: null,
+  queuedSignals: 0,
+};
+
+export const mockBrokerStatus: BrokerStatus = {
+  connected: true,
+  brokerType: "paper",
+  accountId: "PAPER-demo",
+  isPaper: true,
+  lastConnected: "2026-02-12T08:00:00Z",
+};
+
+// --- Journal Mock Data ---
+function generateMockTrades(count: number): Trade[] {
+  const instruments = ["MNQ", "MES", "MCL", "MGC", "MYM"];
+  const directions: Array<"LONG" | "SHORT"> = ["LONG", "SHORT"];
+  const exitReasons = ["STOP_LOSS", "TAKE_PROFIT", "MANUAL"];
+  const emotions = ["calm", "confident", "anxious", "fomo", null];
+  const qualities = ["textbook", "acceptable", "forced", null];
+  const trades: Trade[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const dir = directions[i % 2];
+    const instrument = instruments[i % instruments.length];
+    const isWin = i % 3 !== 0;
+    const pnl = isWin ? (50 + (i * 37) % 400) : -(30 + (i * 23) % 250);
+    const r = isWin ? (0.5 + (i * 17) % 300 / 100) : -(0.3 + (i * 13) % 150 / 100);
+    const baseDate = new Date("2026-02-12T00:00:00Z");
+    baseDate.setDate(baseDate.getDate() - i);
+
+    trades.push({
+      id: `trade-${i + 1}`,
+      signalId: i % 3 === 0 ? null : `sig-closed-${i}`,
+      instrumentSymbol: instrument,
+      direction: dir,
+      entryPrice: 20000 + (i * 127) % 2000,
+      exitPrice: 20000 + (i * 139) % 2000,
+      quantity: 1 + (i % 3),
+      realizedPnl: Math.round(pnl * 100) / 100,
+      netPnl: Math.round((pnl - 1.24) * 100) / 100,
+      rMultiple: Math.round(r * 100) / 100,
+      mae: -(5 + (i * 11) % 50),
+      mfe: 10 + (i * 7) % 80,
+      exitReason: exitReasons[i % 3],
+      enteredAt: new Date(baseDate.getTime() - 3600000).toISOString(),
+      closedAt: baseDate.toISOString(),
+      rating: i % 4 !== 0 ? 1 + (i % 5) : null,
+      emotionalState: emotions[i % emotions.length],
+      setupQuality: qualities[i % qualities.length],
+      notes: i % 4 === 0 ? "Clean setup, followed the plan." : null,
+      screenshots: [],
+      tags: i % 3 === 0 ? ["trendline-break", "A+"] : [],
+      playbook: i % 2 === 0 ? "Trendline Break" : null,
+    });
+  }
+  return trades;
+}
+
+export const mockTrades: Trade[] = generateMockTrades(50);
+
+export const mockTradeStats: TradeStats = {
+  totalTrades: 50,
+  winRate: 0.62,
+  avgR: 1.45,
+  totalPnl: 4250.75,
+  bestTrade: 850.00,
+  worstTrade: -380.00,
+  avgWin: 225.50,
+  avgLoss: -145.30,
+  profitFactor: 2.15,
 };

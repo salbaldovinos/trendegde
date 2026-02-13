@@ -1,7 +1,7 @@
 # TrendEdge — Project Progress Tracker
 
 **Last Updated:** 2026-02-12
-**Overall Status:** Early Development (~30% complete)
+**Overall Status:** Mid Development (~45% complete)
 
 ---
 
@@ -14,11 +14,11 @@
 |-----|--------|--------|---------|-----------|
 | FSD-001 | Platform Infrastructure | done | — | 2026-02-12 |
 | FSD-002 | Trendline Detection | done | 2026-02-12 | 2026-02-12 |
-| FSD-003 | Trade Execution (main) | not started | — | — |
-| FSD-003a | Signal Ingestion | not started | — | — |
-| FSD-003b | Risk Management | not started | — | — |
-| FSD-003c | Broker Adapters | not started | — | — |
-| FSD-003d | Order Lifecycle | not started | — | — |
+| FSD-003 | Trade Execution (main) | done | 2026-02-12 | 2026-02-12 |
+| FSD-003a | Signal Ingestion | done | 2026-02-12 | 2026-02-12 |
+| FSD-003b | Risk Management | done | 2026-02-12 | 2026-02-12 |
+| FSD-003c | Broker Adapters | done | 2026-02-12 | 2026-02-12 |
+| FSD-003d | Order Lifecycle | done | 2026-02-12 | 2026-02-12 |
 | FSD-004 | Trade Journaling | not started | — | — |
 | FSD-005 | Playbook System | not started | — | — |
 | FSD-006 | Performance Analytics (main) | not started | — | — |
@@ -42,7 +42,7 @@
 | FSD-011 | Frontend Dashboard (main) | in-progress | — | — |
 | FSD-011a | App Shell | in-progress | 2026-02-12 | — |
 | FSD-011b | Dashboard & Trendlines | in-progress | 2026-02-12 | — |
-| FSD-011c | Execution & Journal Views | not started | — | — |
+| FSD-011c | Execution & Journal Views | in-progress | 2026-02-12 | — |
 | FSD-011d | Analytics & Playbook Views | not started | — | — |
 | FSD-011e | Settings, Onboarding & Chat | not started | — | — |
 
@@ -124,23 +124,31 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 ---
 
 ### PRD-003: Trade Execution Pipeline
-**Status: 0% Complete** | Phase 1 | Priority: P0
+**Status: 98% Complete** | Phase 1 | Priority: P0
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Signal ingestion (internal, TradingView, manual) | Not Started | FSD-003a |
-| Signal normalization & deduplication | Not Started | FSD-003a |
-| Risk management engine | Not Started | FSD-003b |
-| Broker adapter ABC | Not Started | FSD-003c |
-| IBKR adapter (ib_async) | Not Started | FSD-003c |
-| Tradovate adapter (REST/WebSocket) | Not Started | FSD-003c |
+| Signal ingestion (internal, TradingView, manual) | Done | FSD-003a: manual + webhook endpoints, Celery task |
+| Signal normalization & deduplication | Done | FSD-003a: Redis dedup (5-min window), price validation |
+| Risk management engine | Done | FSD-003b: 8 checks, circuit breaker, quantity calc |
+| Broker adapter ABC | Done | FSD-003c: BrokerAdapter interface, adapter registry |
+| IBKR adapter (ib_async) | Stub | FSD-003c: Phase 2 |
+| Tradovate adapter (REST/WebSocket) | Stub | FSD-003c: Phase 2 |
 | Webull adapter (SDK) | Not Started | FSD-003c, Phase 2 |
-| Paper trading simulator | Not Started | FSD-003c |
-| Order lifecycle management | Not Started | FSD-003d |
-| Bracket order construction | Not Started | FSD-003d |
-| Position tracking & fill management | Not Started | FSD-003d |
-| Circuit breaker (3 failures, 15-min cooldown) | Not Started | |
-| DB tables: signals, orders, positions, fills | Not Started | |
+| Paper trading simulator | Done | FSD-003c: Full PaperBrokerAdapter with slippage, OCO |
+| Order lifecycle management | Done | FSD-003d: CRUD, OCO, cancel, modify |
+| Bracket order construction | Done | FSD-003d: 3-order bracket (entry + SL + TP) |
+| Position tracking & fill management | Done | FSD-003d: P&L, R-multiple, MAE/MFE, dynamic contract specs |
+| Circuit breaker (3 failures, 15-min cooldown) | Done | Redis-backed, integrated with paper position monitoring |
+| OrderEvent audit trail | Done | Records every status transition |
+| Webhook HMAC verification | Done | HMAC-SHA256 signature check (X-Webhook-Signature) |
+| Correlation symbol normalization | Done | Micro symbols normalized to full-size for lookups |
+| DB tables: 11 execution tables | Done | Migration 0006, all with RLS policies |
+| Seed data: 14 contract specs, 21 correlations | Done | ES, NQ, YM, GC, CL, RTY, SI + micros |
+| Unit tests | Done | 76 tests across 4 files |
+| Integration tests | Done | 15 tests across 2 files |
+| Frontend execution page | Done | 7 components wired to live API |
+| Frontend API integration | Done | snake_case/camelCase transform, paginated response unwrapping |
 
 **Spec Coverage:** FSD-003, FSD-003a, FSD-003b, FSD-003c, FSD-003d fully written
 
@@ -327,8 +335,8 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Trendline detection page | Done | FSD-011b: 3-column with chart, list panel, detail/config panel |
 | Candlestick chart | Done | FSD-011b: TradingView Lightweight Charts with trendline overlays |
 | Detection config panel | Done | FSD-011b: 6 params with sliders, presets, apply/reset |
-| Execution page | Not Started | FSD-011c |
-| Journal page | Not Started | FSD-011c |
+| Execution page | Done | FSD-011c: 7 components, live API, paper/live toggle, SL/TP modify |
+| Journal page | Not Started | FSD-011c: blocked on FSD-004 backend |
 | Analytics dashboard | Not Started | FSD-011d |
 | Playbook management pages | Not Started | FSD-011d |
 | Settings pages | Not Started | FSD-011e |
@@ -355,10 +363,17 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | alerts | Done | Done | Not Started | Done |
 | user_detection_config | Done | Done | Not Started | Done |
 | user_watchlist | Done | Done | Not Started | Done |
-| signals | Not Started | Not Started | Not Started | -- |
-| orders | Not Started | Not Started | Not Started | -- |
-| positions | Not Started | Not Started | Not Started | -- |
-| fills | Not Started | Not Started | Not Started | -- |
+| signals | Done | Done | Not Started | Done |
+| orders | Done | Done | Not Started | Done |
+| order_events | Done | Done | Not Started | No (joined via order) |
+| positions | Done | Done | Not Started | Done |
+| contract_specifications | Done | Done | Not Started | No (shared ref) |
+| contract_calendar | Done | Done | Not Started | No (shared ref) |
+| instrument_correlations | Done | Done | Not Started | No (shared ref) |
+| webhook_urls | Done | Done | Not Started | Done |
+| user_risk_settings | Done | Done | Not Started | Done |
+| risk_check_audit | Done | Done | Not Started | No (joined via signal) |
+| risk_settings_changelog | Done | Done | Not Started | Done |
 | journal_entries | Not Started | Not Started | Not Started | -- |
 | journal_screenshots | Not Started | Not Started | Not Started | -- |
 | playbooks | Not Started | Not Started | Not Started | -- |
@@ -382,16 +397,19 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 | Watchlist (/watchlist/*) | 3 | 3 | 100% |
 | Detection Config (/config/*) | 3 | 3 | 100% |
 | Alerts (/alerts/*) | 3 | 3 | 100% |
-| Signals (/signals/*) | ~5 | 0 | 0% |
-| Orders (/orders/*) | ~6 | 0 | 0% |
+| Signals (/signals/*) | ~5 | 4 | 80% |
+| Orders (/orders/*) | ~6 | 4 | 67% |
+| Positions (/positions/*) | ~4 | 4 | 100% |
+| Risk Settings (/settings/*) | 2 | 2 | 100% |
+| Circuit Breaker (/circuit-breaker/*) | 2 | 2 | 100% |
 | Journal (/journal/*) | ~8 | 0 | 0% |
 | Playbooks (/playbooks/*) | ~7 | 0 | 0% |
 | Analytics (/analytics/*) | ~6 | 0 | 0% |
 | AI (/chat/*) | ~4 | 0 | 0% |
 | Billing (/billing/*) | ~6 | 0 | 0% |
 | Notifications (/notifications/*) | ~5 | 0 | 0% |
-| Webhooks (/webhooks/*) | ~3 | 0 | 0% |
-| **Total** | **~81** | **47** | **~58%** |
+| Webhooks (/webhooks/*) | ~3 | 1 | 33% |
+| **Total** | **~87** | **64** | **~74%** |
 
 ---
 
@@ -399,8 +417,8 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 
 | Category | Written | Status |
 |----------|---------|--------|
-| Backend unit tests | 47+ | 5 files: test_health, test_error_handling, test_middleware, test_config, test_detection_engine |
-| Backend integration tests | 18 | 3 files: test_db_health, test_redis_health, test_trendline_pipeline (16 tests) |
+| Backend unit tests | 123+ | 9 files: test_health, test_error_handling, test_middleware, test_config, test_detection_engine, test_execution_service, test_signal_service, test_risk_service, test_paper_adapter |
+| Backend integration tests | 33 | 5 files: test_db_health, test_redis_health, test_trendline_pipeline, test_execution_routes, test_execution_pipeline |
 | Backend e2e tests | 0 | Not started |
 | Frontend unit tests (Jest) | 0 | Not started |
 | Frontend e2e tests (Playwright) | 0 | Not started |
@@ -444,6 +462,12 @@ TrendEdge is an AI-powered futures trading platform with 11 product domains defi
 19. Frontend app shell: sidebar navigation, header bar, dashboard layout, providers, Zustand stores, TanStack Query hooks
 20. Dashboard home page: P&L summary, quick stats, active positions, trendline alerts, recent trades widgets
 21. Trendline detection page: candlestick chart (Lightweight Charts), trendline list panel, detail panel, detection config panel with presets
+22. Trade execution pipeline: signal ingestion (manual + webhook), 8 risk checks, bracket order construction, paper broker adapter, position lifecycle, circuit breaker
+23. 11 execution DB tables with RLS: signals, orders, order_events, positions, contract_specifications, contract_calendar, instrument_correlations, webhook_urls, user_risk_settings, risk_check_audit, risk_settings_changelog
+24. 16+ API endpoints: signals (4), orders (4), positions (4), risk settings (2), circuit breaker (2), webhooks (1)
+25. 3 Celery tasks: process_signal (high queue), monitor_paper_positions (5s beat), reconcile_fills (5min beat)
+26. 91 execution test suite: 76 unit tests (execution_service, signal_service, risk_service, paper_adapter) + 15 integration tests (routes, pipeline)
+27. Frontend execution page: 7 components (positions table, orders table, signal queue, manual trade form, paper/live toggle, circuit breaker banner, broker status), all wired to live API with snake_case/camelCase transform
 
 ## Recommended Build Order
 

@@ -7,10 +7,9 @@ async function proxyRequest(request: NextRequest) {
   const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
 
-  // Build the target URL by stripping the /api prefix
+  // Forward the full path to the backend (backend routes are at /api/v1/*)
   const url = new URL(request.url)
-  const targetPath = url.pathname.replace(/^\/api/, "")
-  const targetUrl = `${API_URL}${targetPath}${url.search}`
+  const targetUrl = `${API_URL}${url.pathname}${url.search}`
 
   // Forward headers, adding Authorization if we have a session
   const headers = new Headers()

@@ -26,7 +26,7 @@ import {
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/trendlines", label: "Trendlines", icon: TrendingUp },
-  { href: "/trades", label: "Trades", icon: LineChart },
+  { href: "/execution", label: "Execution", icon: LineChart },
   { href: "/journal", label: "Journal", icon: BookOpen },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
 ];

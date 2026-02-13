@@ -62,9 +62,12 @@ celery_app.conf.update(
         "app.tasks.trendline_tasks.recalculate_*": {"queue": "detection"},
         "app.tasks.trendline_tasks.evaluate_*": {"queue": "alerts"},
         "app.tasks.trendline_tasks.gap_*": {"queue": "low"},
+        "app.tasks.execution_tasks.process_signal": {"queue": "high"},
+        "app.tasks.execution_tasks.monitor_paper_positions": {"queue": "detection"},
+        "app.tasks.execution_tasks.reconcile_fills": {"queue": "default"},
     },
     # Task autodiscovery
-    include=["app.tasks.trendline_tasks"],
+    include=["app.tasks.trendline_tasks", "app.tasks.execution_tasks"],
     # Beat schedule for periodic tasks
     beat_schedule={
         "ingest_candles": {
@@ -74,6 +77,14 @@ celery_app.conf.update(
         "gap_detection_and_fill": {
             "task": "app.tasks.trendline_tasks.gap_detection_and_fill",
             "schedule": crontab(minute=0, hour=6),
+        },
+        "monitor_paper_positions": {
+            "task": "app.tasks.execution_tasks.monitor_paper_positions",
+            "schedule": 5.0,  # every 5 seconds
+        },
+        "reconcile_fills": {
+            "task": "app.tasks.execution_tasks.reconcile_fills",
+            "schedule": crontab(minute="*/5"),  # every 5 minutes
         },
     },
 )
